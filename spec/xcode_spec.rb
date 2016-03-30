@@ -83,4 +83,11 @@ RSpec.describe XCodeBuildHelper::XCode do
       @xcode.profdata_location
     end
   end
+
+  context "#lint" do
+    it "should call oclint" do
+      expect(XCodeBuildHelper::Execute).to receive(:call).with("bundle exec oclint-json-compilation-database -e \"IGNORE\" -- -report-type html -o build/reports/lint.html -rc LONG_LINE=120")
+      @xcode.lint :ignore => "IGNORE", :report_type => "html", :output => "build/reports/lint.html", :custom_rules => { 'LONG_LINE' => 120 }
+    end
+  end
 end

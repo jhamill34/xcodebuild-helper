@@ -23,6 +23,25 @@ module XCodeBuildHelper
       XCodeBuildHelper::Execute.call("xcrun llvm-cov show -instr-profile \"#{profdata_location}\" \"#{app_binary_location}\" #{source}")
     end
 
+    def lint(opts = {})
+      cmd = "bundle exec oclint-json-compilation-database"
+      if(opts[:ignore])
+        cmd += " -e \"#{opts[:ignore]}\""
+      end
+      cmd += " --"
+      if(opts[:report_type] && opts[:output])
+        cmd += " -report-type #{opts[:report_type]} -o #{opts[:output]}"
+      end
+
+      if opts[:custom_rules]
+        opts[:custom_rules].each do |key, value|
+          cmd += " -rc #{key}=#{value}"
+        end
+      end
+
+      XCodeBuildHelper::Execute.call(cmd)
+    end
+
     def base_app_location
       cmd = create_base_cmd
       result = XCodeBuildHelper::Execute.call(cmd + "-showBuildSettings")
