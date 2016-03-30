@@ -15,12 +15,15 @@ module XCodeBuildHelper
     end
 
     def test_suite(opts = {})
+      report_type = opts[:report_type] || 'html'
       cmd = create_base_cmd + parse_destination(opts)
-      XCodeBuildHelper::Execute.call(cmd + "test | bundle exec xcpretty --color --report html")
+      XCodeBuildHelper::Execute.call(cmd + "test | bundle exec xcpretty --color --report #{report_type}")
     end
 
-    def generate_coverage(source = "")
-      XCodeBuildHelper::Execute.call("xcrun llvm-cov show -instr-profile \"#{profdata_location}\" \"#{app_binary_location}\" #{source}")
+    def generate_coverage(opts = {})
+      source = opts[:source]
+      report_type = opts[:report_type]
+      result = XCodeBuildHelper::Execute.call("xcrun llvm-cov show -instr-profile \"#{profdata_location}\" \"#{app_binary_location}\" #{source}")
     end
 
     def lint(opts = {})

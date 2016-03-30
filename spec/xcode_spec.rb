@@ -29,8 +29,8 @@ RSpec.describe XCodeBuildHelper::XCode do
 
   context "#test_suite" do
     it "will call the correct text configuration" do
-      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk iphonesimulator -config Debug test | bundle exec xcpretty --color --report html")
-      @xcode.test_suite
+      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk iphonesimulator -config Debug test | bundle exec xcpretty --color --report junit")
+      @xcode.test_suite :report_type => 'junit'
     end
 
     it "will call with optional destination parameters" do
@@ -44,7 +44,7 @@ RSpec.describe XCodeBuildHelper::XCode do
       allow(@xcode).to receive(:app_binary_location).and_return('/path/to/app/binary')
       allow(@xcode).to receive(:profdata_location).and_return('/path/to/profdata')
       expect(XCodeBuildHelper::Execute).to receive(:call).with("xcrun llvm-cov show -instr-profile \"/path/to/profdata\" \"/path/to/app/binary\" /my/source/files/**/*.m")
-      @xcode.generate_coverage "/my/source/files/**/*.m"
+      @xcode.generate_coverage :source => "/my/source/files/**/*.m"
     end
   end
 
@@ -60,8 +60,6 @@ RSpec.describe XCodeBuildHelper::XCode do
     end
   end
 
-	# coverage_directory = Dir[File.join(app_directory.strip, '/CodeCoverage/ServiceLogistics')].first
-	# puts `xcrun llvm-cov show -instr-profile #{coverage_directory}/Coverage.profdata "#{coverage_directory}/Products/Debug-iphonesimulator/Service Logistics.app/Service Logistics" DSL462_iOS/**/*.m`
   context "#app_binary_location" do
     it "will return the location of the app executable" do
       allow(XCodeBuildHelper::Execute).to receive(:call).and_return("OPTION_A = something \nOBJROOT = /path/to/app\nOPTION_B = something else")
