@@ -17,12 +17,12 @@ RSpec.describe XCodeBuildHelper::XCode do
 
   context "#build" do
     it "will call xcodebuild with proper parameters" do
-      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk iphonesimulator -config Debug clean build | bundle exec xcpretty --report json-compilation-database")
+      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk iphonesimulator -config Debug clean build | bundle exec xcpretty --color --report json-compilation-database")
       @xcode.build
     end
 
     it "will call with optional destination parameters" do
-      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk iphonesimulator -config Debug -destination 'platform=PLATFORM,name=NAME,OS=myOS' clean build | bundle exec xcpretty --report json-compilation-database")
+      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk iphonesimulator -config Debug -destination 'platform=PLATFORM,name=NAME,OS=myOS' clean build | bundle exec xcpretty --color --report json-compilation-database")
       @xcode.build :platform => 'PLATFORM', :name => 'NAME', :os => 'myOS'
     end
   end
@@ -43,8 +43,8 @@ RSpec.describe XCodeBuildHelper::XCode do
     it "will generate the code coverage for the sources provided" do
       allow(@xcode).to receive(:app_binary_location).and_return('/path/to/app/binary')
       allow(@xcode).to receive(:profdata_location).and_return('/path/to/profdata')
-      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcrun llvm-cov show -instr-profile \"/path/to/profdata\" \"/path/to/app/binary\" \"/my/source/files\"")
-      @xcode.generate_coverage "/my/source/files"
+      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcrun llvm-cov show -instr-profile \"/path/to/profdata\" \"/path/to/app/binary\" /my/source/files/**/*.m")
+      @xcode.generate_coverage "/my/source/files/**/*.m"
     end
   end
 
@@ -55,8 +55,8 @@ RSpec.describe XCodeBuildHelper::XCode do
     end
 
     it "will return the path" do
-      allow(XCodeBuildHelper::Execute).to receive(:call).and_return("OPTION_A = something \nOBJROOT = /path/to/app\nOPTION_B = something else")
-      expect(@xcode.base_app_location).to eq '/path/to/app'
+      allow(XCodeBuildHelper::Execute).to receive(:call).and_return("OPTION_A = something \nOBJROOT = /path/to/app path\nOPTION_B = something else")
+      expect(@xcode.base_app_location).to eq '/path/to/app path'
     end
   end
 
@@ -79,7 +79,7 @@ RSpec.describe XCodeBuildHelper::XCode do
   context "#profdata_location" do
     it "will return the location of the profdata" do
       allow(XCodeBuildHelper::Execute).to receive(:call).and_return("OPTION_A = something \nOBJROOT = /path/to/app\nOPTION_B = something else")
-      expect(Dir).to receive(:glob).with("/path/to/app/CodeCoverage/SCHEME/Coverage.profdata")
+      expect(Dir).to receive(:glob).with("/path/to/app/CodeCoverage/SCHEME/Coverage.profdata").and_return([])
       @xcode.profdata_location
     end
   end

@@ -11,7 +11,7 @@ module XCodeBuildHelper
 
     def build(opts = {})
       cmd = create_base_cmd + parse_destination(opts)
-      XCodeBuildHelper::Execute.call(cmd + "clean build | bundle exec xcpretty --report json-compilation-database")
+      XCodeBuildHelper::Execute.call(cmd + "clean build | bundle exec xcpretty --color --report json-compilation-database")
     end
 
     def test_suite(opts = {})
@@ -20,7 +20,7 @@ module XCodeBuildHelper
     end
 
     def generate_coverage(source = "")
-      XCodeBuildHelper::Execute.call("xcrun llvm-cov show -instr-profile \"#{profdata_location}\" \"#{app_binary_location}\" \"#{source}\"")
+      XCodeBuildHelper::Execute.call("xcrun llvm-cov show -instr-profile \"#{profdata_location}\" \"#{app_binary_location}\" #{source}")
     end
 
     def base_app_location
@@ -34,11 +34,11 @@ module XCodeBuildHelper
     end
 
     def profdata_location
-      Dir.glob(base_app_location + "/CodeCoverage/#{@scheme}/Coverage.profdata")
+      Dir.glob(base_app_location + "/CodeCoverage/#{@scheme}/Coverage.profdata").first
     end
 
     def parse_app_settings(settings)
-      result = /OBJROOT = ([a-zA-Z0-9\/]+)/.match(settings)
+      result = /OBJROOT = ([a-zA-Z0-9\/ _\-]+)/.match(settings)
       if result != nil
         result[1]
       else
