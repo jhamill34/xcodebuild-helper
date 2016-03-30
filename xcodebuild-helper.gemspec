@@ -6,8 +6,10 @@ Gem::Specification.new do |s|
   s.description   = ''
   s.authors       = ['Joshua Rasmussen']
   s.email         = 'Josh.Rasmussen@discorp.com'
-  s.files         = ['lib/*.rb']
+  s.files         = `git ls-files`.split($\)
   s.require_paths = ['lib']
+  s.executables   = s.files.grep(%r{^bin/}){ |f| File.basename(f) }
+  s.test_files    = s.files.grep(%r{^(spec)})
 
   s.add_development_dependency "rspec"
   s.add_development_dependency "guard-rspec"
