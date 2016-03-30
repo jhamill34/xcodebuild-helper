@@ -11,12 +11,12 @@ module XCodeBuildHelper
 
     def build(opts = {})
       cmd = create_base_cmd + parse_destination(opts)
-      XCodeBuildHelper::Execute.call(cmd + "build")
+      XCodeBuildHelper::Execute.call(cmd + "clean build | bundle exec xcpretty --report json-compilation-database")
     end
 
     def test_suite(opts = {})
       cmd = create_base_cmd + parse_destination(opts)
-      XCodeBuildHelper::Execute.call(cmd + "test")
+      XCodeBuildHelper::Execute.call(cmd + "test | bundle exec xcpretty --color --report html")
     end
 
     def generate_coverage(source = "")

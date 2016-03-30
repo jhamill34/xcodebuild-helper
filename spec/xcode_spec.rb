@@ -17,24 +17,24 @@ RSpec.describe XCodeBuildHelper::XCode do
 
   context "#build" do
     it "will call xcodebuild with proper parameters" do
-      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk iphonesimulator -config Debug build")
+      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk iphonesimulator -config Debug clean build | bundle exec xcpretty --report json-compilation-database")
       @xcode.build
     end
 
     it "will call with optional destination parameters" do
-      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk iphonesimulator -config Debug -destination 'platform=PLATFORM,name=NAME,OS=myOS' build")
+      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk iphonesimulator -config Debug -destination 'platform=PLATFORM,name=NAME,OS=myOS' clean build | bundle exec xcpretty --report json-compilation-database")
       @xcode.build :platform => 'PLATFORM', :name => 'NAME', :os => 'myOS'
     end
   end
 
   context "#test_suite" do
     it "will call the correct text configuration" do
-      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk iphonesimulator -config Debug test")
+      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk iphonesimulator -config Debug test | bundle exec xcpretty --color --report html")
       @xcode.test_suite
     end
 
     it "will call with optional destination parameters" do
-      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk iphonesimulator -config Debug -destination 'platform=PLATFORM,name=NAME,OS=myOS' test")
+      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk iphonesimulator -config Debug -destination 'platform=PLATFORM,name=NAME,OS=myOS' test | bundle exec xcpretty --color --report html")
       @xcode.test_suite :platform => 'PLATFORM', :name => 'NAME', :os => 'myOS'
     end
   end
