@@ -1,84 +1,112 @@
 require 'execute'
+require 'device'
+require 'test_plan'
+require 'coverage_plan'
+require 'lint_plan'
 
 module XCodeBuildHelper
   class XCode
-    attr_accessor :workspace, :scheme
-
-    def initialize(workspace = "", scheme = "")
-      @workspace = workspace
-      @scheme = scheme
+    def initialize
+      @device_registry = {}
+      @tp_registry = {}
+      @coverage_registry = {}
+      @lint_registry = {}
     end
 
-    def build(opts = {})
-      cmd = create_base_cmd + parse_destination(opts)
-      XCodeBuildHelper::Execute.call(cmd + "clean build | bundle exec xcpretty --color --report json-compilation-database")
+    def workspace(name)
+      @workspace = name
     end
 
-    def test_suite(opts = {})
-      report_type = opts[:report_type] || 'html'
-      cmd = create_base_cmd + parse_destination(opts)
-      XCodeBuildHelper::Execute.call(cmd + "test | bundle exec xcpretty --color --report #{report_type}")
+    def get_workspace
+      @workspace
     end
 
-    def generate_coverage(opts = {})
-      source = opts[:source]
-      report_type = opts[:report_type]
-      result = XCodeBuildHelper::Execute.call("xcrun llvm-cov show -instr-profile \"#{profdata_location}\" \"#{app_binary_location}\" #{source}")
+    def scheme(name)
+      @scheme = name
     end
 
-    def lint(opts = {})
-      cmd = "bundle exec oclint-json-compilation-database"
-      if(opts[:ignore])
-        cmd += " -e \"#{opts[:ignore]}\""
-      end
-      cmd += " --"
-      if(opts[:report_type] && opts[:output])
-        cmd += " -report-type #{opts[:report_type]} -o #{opts[:output]}"
-      end
+    def get_scheme
+      @scheme
+    end
 
-      if opts[:custom_rules]
-        opts[:custom_rules].each do |key, value|
-          cmd += " -rc #{key}=#{value}"
+    def device(name, device = nil, &block)
+      if device == nil
+        if @device_registry[name] == nil
+          device = XCodeBuildHelper::Device.new
+        else
+          device = @device_registry[name]
         end
       end
 
-      XCodeBuildHelper::Execute.call(cmd)
-    end
-
-    def base_app_location
-      cmd = create_base_cmd
-      result = XCodeBuildHelper::Execute.call(cmd + "-showBuildSettings")
-      parse_app_settings(result)
-    end
-
-    def app_binary_location
-      Dir.glob(base_app_location + "/CodeCoverage/#{@scheme}/Products/Debug-iphonesimulator/#{@workspace.gsub(/\s+/, '\\ ')}.app/#{@workspace.gsub(/\s+/,"\\ ")}").first
-    end
-
-    def profdata_location
-      Dir.glob(base_app_location + "/CodeCoverage/#{@scheme}/Coverage.profdata").first
-    end
-
-    def parse_app_settings(settings)
-      result = /OBJROOT = ([a-zA-Z0-9\/ _\-]+)/.match(settings)
-      if result != nil
-        result[1]
-      else
-        ""
+      if block_given?
+        device.instance_eval(&block)
       end
+
+      @device_registry[name] = device
     end
 
-    def create_base_cmd
-      "xcodebuild -workspace \"#{@workspace}.xcworkspace\" -scheme #{@scheme} -sdk iphonesimulator -config Debug "
+    def get_device(name)
+      @device_registry[name]
     end
 
-    def parse_destination(opts = {})
-      if opts[:platform] && opts[:name] && opts[:os]
-        "-destination 'platform=#{opts[:platform]},name=#{opts[:name]},OS=#{opts[:os]}' "
-      else
-        ""
+    def test_plan(name, test_plan = nil, &block)
+      if test_plan == nil
+        if @tp_registry[name] == nil
+          test_plan = XCodeBuildHelper::TestPlan.new
+        else
+          test_plan = @tp_registry[name]
+        end
       end
+
+      if block_given?
+        test_plan.instance_eval(&block)
+      end
+
+      @tp_registry[name] = test_plan
     end
-    private :create_base_cmd, :parse_destination, :parse_app_settings
+
+    def get_test_plan(name)
+      @tp_registry[name]
+    end
+
+    def coverage_plan(name, coverage_plan = nil, &block)
+      if coverage_plan == nil
+        if @coverage_registry[name] == nil
+          coverage_plan = XCodeBuildHelper::CoveragePlan.new
+        else
+          coverage_plan = @coverage_registry[name]
+        end
+      end
+
+      if block_given?
+        coverage_plan.instance_eval(&block)
+      end
+
+      @coverage_registry[name] = coverage_plan
+    end
+
+    def get_coverage_plan(name)
+      @coverage_registry[name]
+    end
+
+    def lint_plan(name, lint_plan = nil, &block)
+      if lint_plan == nil
+        if @lint_registry[name] == nil
+          lint_plan = XCodeBuildHelper::LintPlan.new
+        else
+          lint_plan = @lint_registry[name]
+        end
+      end
+
+      if block_given?
+        lint_plan.instance_eval(&block)
+      end
+
+      @lint_registry[name] = lint_plan
+    end
+
+    def get_lint_plan(name)
+      @lint_registry[name]
+    end
   end
 end
