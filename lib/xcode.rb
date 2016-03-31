@@ -2,7 +2,7 @@ require 'execute'
 
 module XCodeBuildHelper
   class XCode
-    attr_reader :workspace, :scheme
+    attr_accessor :workspace, :scheme
 
     def initialize(workspace = "", scheme = "")
       @workspace = workspace
