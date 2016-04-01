@@ -1,3 +1,5 @@
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'version'
 
 Gem::Specification.new do |s|
@@ -15,6 +17,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "rspec"
   s.add_development_dependency "guard-rspec"
+	s.add_development_dependency "rake"
 
   s.add_dependency "xcpretty"
   s.add_dependency "xcodeproj"
