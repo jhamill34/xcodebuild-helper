@@ -2,8 +2,8 @@ PATH
   remote: .
   specs:
     xcodebuild-helper (0.1.0)
-      xcodeproj
-      xcpretty
+      xcodeproj (~> 0.28)
+      xcpretty (~> 0.2)
 
 GEM
   remote: https://rubygems.org/
@@ -101,9 +101,9 @@ PLATFORMS
 
 DEPENDENCIES
   coveralls
-  guard-rspec
-  rake
-  rspec
+  guard-rspec (~> 4.6)
+  rake (~> 11.1)
+  rspec (~> 3.4)
   xcodebuild-helper!
 
 BUNDLED WITH

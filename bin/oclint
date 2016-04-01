@@ -1,4 +1,5 @@
-  require 'pathname'
+#!/usr/bin/env ruby  
+	require 'pathname'
   pn = Pathname.new(__FILE__)
   opts = ARGV.join(" ")
   puts `"#{pn.dirname}/.././externals/oclint/bin/#{pn.basename}" #{opts}`

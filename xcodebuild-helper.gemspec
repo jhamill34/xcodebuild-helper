@@ -14,11 +14,13 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
   s.executables   = s.files.grep(%r{^bin/}){ |f| File.basename(f) }
   s.test_files    = s.files.grep(%r{^(spec)})
+	s.license				= 'MIT'
+	s.homepage			= 'https://github.com/xlr8runner/xcodebuild-helper'
 
-  s.add_development_dependency "rspec"
-  s.add_development_dependency "guard-rspec"
-	s.add_development_dependency "rake"
+  s.add_development_dependency "rspec", ["~> 3.4"]
+  s.add_development_dependency "guard-rspec", ["~> 4.6"]
+	s.add_development_dependency "rake", ["~> 11.1"]
 
-  s.add_dependency "xcpretty"
-  s.add_dependency "xcodeproj"
+  s.add_dependency "xcpretty", ["~> 0.2"]
+  s.add_dependency "xcodeproj", ["~> 0.28"]
 end
