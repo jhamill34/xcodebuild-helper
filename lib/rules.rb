@@ -15,5 +15,9 @@ module XCodeBuildHelper
         @attributes[name] = args[0]
       end
     end
+
+    def get_attribute_list
+      @attributes.keys
+    end
   end
 end

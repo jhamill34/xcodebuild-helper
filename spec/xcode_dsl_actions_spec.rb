@@ -1,73 +1,136 @@
-# context "#build" do
-#   it "will call xcodebuild with proper parameters" do
-#     expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk iphonesimulator -config Debug clean build | bundle exec xcpretty --color --report json-compilation-database")
-#     @xcode.build
-#   end
-#
-#   it "will call with optional destination parameters" do
-#     expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk iphonesimulator -config Debug -destination 'platform=PLATFORM,name=NAME,OS=myOS' clean build | bundle exec xcpretty --color --report json-compilation-database")
-#     @xcode.build :platform => 'PLATFORM', :name => 'NAME', :os => 'myOS'
-#   end
-# end
-#
-# context "#test_suite" do
-#   it "will call the correct text configuration" do
-#     expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk iphonesimulator -config Debug test | bundle exec xcpretty --color --report junit")
-#     @xcode.test_suite :report_type => 'junit'
-#   end
-#
-#   it "will call with optional destination parameters" do
-#     expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk iphonesimulator -config Debug -destination 'platform=PLATFORM,name=NAME,OS=myOS' test | bundle exec xcpretty --color --report html")
-#     @xcode.test_suite :platform => 'PLATFORM', :name => 'NAME', :os => 'myOS'
-#   end
-# end
-#
-# context "#coverage" do
-#   it "will generate the code coverage for the sources provided" do
-#     allow(@xcode).to receive(:app_binary_location).and_return('/path/to/app/binary')
-#     allow(@xcode).to receive(:profdata_location).and_return('/path/to/profdata')
-#     expect(XCodeBuildHelper::Execute).to receive(:call).with("xcrun llvm-cov show -instr-profile \"/path/to/profdata\" \"/path/to/app/binary\" /my/source/files/**/*.m")
-#     @xcode.generate_coverage :source => "/my/source/files/**/*.m"
-#   end
-# end
-#
-# context "#base_app_location" do
-#   it "will get the app options" do
-#     expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk iphonesimulator -config Debug -showBuildSettings")
-#     @xcode.base_app_location
-#   end
-#
-#   it "will return the path" do
-#     allow(XCodeBuildHelper::Execute).to receive(:call).and_return("OPTION_A = something \nOBJROOT = /path/to/app path\nOPTION_B = something else")
-#     expect(@xcode.base_app_location).to eq '/path/to/app path'
-#   end
-# end
-#
-# context "#app_binary_location" do
-#   it "will return the location of the app executable" do
-#     allow(XCodeBuildHelper::Execute).to receive(:call).and_return("OPTION_A = something \nOBJROOT = /path/to/app\nOPTION_B = something else")
-#     allow(Dir).to receive(:glob).and_return(['/path/to/app/binary.app'])
-#     expect(@xcode.app_binary_location).to eq '/path/to/app/binary.app'
-#   end
-#
-#   it "will search for the binary location" do
-#     allow(XCodeBuildHelper::Execute).to receive(:call).and_return("OPTION_A = something \nOBJROOT = /path/to/app\nOPTION_B = something else")
-#     expect(Dir).to receive(:glob).with("/path/to/app/CodeCoverage/SCHEME/Products/Debug-iphonesimulator/WORK\\ SPACE.app/WORK\\ SPACE").and_return([])
-#     @xcode.app_binary_location
-#   end
-# end
-#
-# context "#profdata_location" do
-#   it "will return the location of the profdata" do
-#     allow(XCodeBuildHelper::Execute).to receive(:call).and_return("OPTION_A = something \nOBJROOT = /path/to/app\nOPTION_B = something else")
-#     expect(Dir).to receive(:glob).with("/path/to/app/CodeCoverage/SCHEME/Coverage.profdata").and_return([])
-#     @xcode.profdata_location
-#   end
-# end
-#
-# context "#lint" do
-#   it "should call oclint" do
-#     expect(XCodeBuildHelper::Execute).to receive(:call).with("bundle exec oclint-json-compilation-database -e \"IGNORE\" -- -report-type html -o build/reports/lint.html -rc LONG_LINE=120")
-#     @xcode.lint :ignore => "IGNORE", :report_type => "html", :output => "build/reports/lint.html", :custom_rules => { 'LONG_LINE' => 120 }
-#   end
-# end
+require 'xcodebuild-helper'
+
+RSpec.describe "DSL actions" do
+  context "build" do
+    before(:each) do
+      XCodeBuildHelper.define :default do
+        workspace "WORK SPACE"
+        scheme "SCHEME"
+        sdk "SDK"
+        config "CONFIG"
+        device :ipad do
+          platform "PLATFORM"
+          name "NAME"
+          os "OS"
+        end
+      end
+    end
+
+    it "should create the proper CLI to build the app" do
+      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk SDK -config CONFIG clean build | bundle exec xcpretty --color --report json-compilation-database")
+      XCodeBuildHelper.build(:default)
+    end
+
+    it "should create the proper CLI for the ipad" do
+      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk SDK -config CONFIG -destination 'platform=PLATFORM,name=NAME,OS=OS' clean build | bundle exec xcpretty --color --report json-compilation-database")
+      XCodeBuildHelper.build(:default, :ipad)
+    end
+  end
+
+  context "test_suite" do
+    before(:each) do
+      XCodeBuildHelper.define :default do
+        workspace "WORK SPACE"
+        scheme "SCHEME"
+        sdk "SDK"
+        config "CONFIG"
+
+        device :ipad do
+          platform "PLATFORM"
+          name "NAME"
+          os "OS"
+        end
+
+        test_plan :plan_a do
+          report_type 'html'
+        end
+      end
+    end
+
+    it "should create the proper CLI for testing" do
+      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk SDK -config CONFIG test | bundle exec xcpretty --color --report html")
+      XCodeBuildHelper.test_suite(:default, :plan_a)
+    end
+
+    it "should create the proper CLI for testing for ipad" do
+      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk SDK -config CONFIG -destination 'platform=PLATFORM,name=NAME,OS=OS' test | bundle exec xcpretty --color --report html")
+      XCodeBuildHelper.test_suite(:default, :plan_a, :ipad)
+    end
+  end
+
+  context "code coverage" do
+    before(:each) do
+      XCodeBuildHelper.define :default do
+        workspace "WORK SPACE"
+        scheme "SCHEME"
+        sdk "SDK"
+        config "CONFIG"
+
+        device :ipad do
+          platform "PLATFORM"
+          name "NAME"
+          os "OS"
+        end
+
+        coverage_plan :plan_a do
+          report_type "xml"
+          source_files ["path/to/files/*"]
+        end
+      end
+    end
+
+    it "will find the base app directory" do
+      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcodebuild -workspace \"WORK SPACE.xcworkspace\" -scheme SCHEME -sdk SDK -config CONFIG -showBuildSettings")
+      XCodeBuildHelper.base_app_location(XCodeBuildHelper[:default])
+    end
+
+    it "will find the app binary" do
+      allow(XCodeBuildHelper).to receive(:base_app_location).and_return("/path/to/app")
+      expect(Dir).to receive(:glob).with("/path/to/app/CodeCoverage/SCHEME/Products/CONFIG-SDK/WORK\\ SPACE.app/WORK\\ SPACE").and_return([])
+      XCodeBuildHelper.app_binary_location(XCodeBuildHelper[:default])
+    end
+
+    it "will find the app profdata" do
+      allow(XCodeBuildHelper).to receive(:base_app_location).and_return("/path/to/app")
+      expect(Dir).to receive(:glob).with("/path/to/app/CodeCoverage/SCHEME/Coverage.profdata").and_return([])
+      XCodeBuildHelper.profdata_location(XCodeBuildHelper[:default])
+    end
+
+    it "will return the CLI for finding code coverage" do
+      allow(XCodeBuildHelper).to receive(:app_binary_location).and_return("/path/to/app/bin")
+      allow(XCodeBuildHelper).to receive(:profdata_location).and_return("/path/to/app/prof")
+      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcrun llvm-cov show -instr-profile \"/path/to/app/prof\" \"/path/to/app/bin\" path/to/files/*")
+      XCodeBuildHelper.generate_coverage(:default, :plan_a)
+    end
+  end
+
+  context "lint" do
+    before(:each) do
+      XCodeBuildHelper.define :default do
+        workspace "WORK SPACE"
+        scheme "SCHEME"
+        sdk "SDK"
+        config "CONFIG"
+
+        device :ipad do
+          platform "PLATFORM"
+          name "NAME"
+          os "OS"
+        end
+
+        lint_plan :plan_a do
+          report_type "REPORT_TYPE"
+          output "OUTPUT"
+          ignore "IGNORE"
+          rules do
+            long_line 120
+          end
+        end
+      end
+    end
+    it "should call the correct CLI for the lint" do
+      expect(XCodeBuildHelper::Execute).to receive(:call).with("bundle exec oclint-json-compilation-database -e \"IGNORE\" -- -report-type REPORT_TYPE -o OUTPUT -rc LONG_LINE=120")
+      XCodeBuildHelper.lint(:default, :plan_a)
+    end
+  end
+end

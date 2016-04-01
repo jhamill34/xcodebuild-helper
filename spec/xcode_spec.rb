@@ -7,6 +7,8 @@ RSpec.describe XCodeBuildHelper::XCode do
     @xcode = XCodeBuildHelper::XCode.new
     @xcode.workspace "WORK SPACE"
     @xcode.scheme "SCHEME"
+    @xcode.sdk "iphonesimulator"
+    @xcode.config "Debug"
   end
 
   context "setter methods" do
@@ -16,6 +18,14 @@ RSpec.describe XCodeBuildHelper::XCode do
 
     it "should have set the scheme attribute" do
       expect(@xcode.get_scheme).to eq "SCHEME"
+    end
+
+    it "should have set the sdk" do
+      expect(@xcode.get_sdk).to eq "iphonesimulator"
+    end
+
+    it "should set the config" do
+      expect(@xcode.get_config).to eq "Debug"
     end
   end
 

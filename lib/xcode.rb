@@ -29,6 +29,22 @@ module XCodeBuildHelper
       @scheme
     end
 
+    def sdk(name)
+      @sdk = name
+    end
+
+    def get_sdk
+      @sdk
+    end
+
+    def config(name)
+      @config = name
+    end
+
+    def get_config
+      @config
+    end
+
     def device(name, device = nil, &block)
       if device == nil
         if @device_registry[name] == nil
