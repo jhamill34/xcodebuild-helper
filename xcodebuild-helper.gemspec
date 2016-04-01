@@ -1,11 +1,13 @@
+require 'version'
+
 Gem::Specification.new do |s|
   s.name          = 'xcodebuild-helper'
-  s.version       = '0.0.1'
+  s.version       = XCodeBuildHelper::VERSION
   s.date          = '2016-03-30'
-  s.summary       = 'Ruby gem to help call xcode methods more simply'
-  s.description   = ''
+  s.summary       = 'DSL to help call xcode CLI more easliy'
+  s.description   = 'Very useful when writing scripts to automate xcode development or when creating ci scripts to automate deployment'
   s.authors       = ['Joshua Rasmussen']
-  s.email         = 'Josh.Rasmussen@discorp.com'
+  s.email         = 'xlr8runner@gmail.com'
   s.files         = `git ls-files`.split($\)
   s.require_paths = ['lib']
   s.executables   = s.files.grep(%r{^bin/}){ |f| File.basename(f) }
