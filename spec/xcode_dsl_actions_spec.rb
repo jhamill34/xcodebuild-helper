@@ -1,5 +1,6 @@
 require 'xcodebuild-helper'
 require 'nokogiri'
+require 'fileutils'
 
 RSpec.describe "DSL actions" do
   context "build" do
@@ -79,6 +80,7 @@ RSpec.describe "DSL actions" do
           output "/build/reports"
         end
       end
+      allow(FileUtils).to receive(:mkdir_p)
     end
 
     it "will find the base app directory" do
@@ -120,6 +122,19 @@ RSpec.describe "DSL actions" do
         allow(XCodeBuildHelper::Execute).to receive(:call).and_return("FILE_A\nHTML STUFF")
         allow(XCodeBuildHelper::CoverageHtmlConverter).to receive(:convert_file).and_return(converted_result)
         expect(File).to receive(:write).with("/build/reports/FILE_A.html", "HTML STUFF")
+
+        XCodeBuildHelper.generate_coverage(:default, :plan_a)
+      end
+
+      it "needs to create the output directory first" do
+        mockHtml = double(Nokogiri::HTML::Builder)
+        allow(mockHtml).to receive(:to_html).and_return("HTML STUFF")
+        converted_result = { :content => mockHtml, :title => "/path/to/file/FILE_A"}
+
+        allow(XCodeBuildHelper::Execute).to receive(:call).and_return("FILE_A\nHTML STUFF")
+        allow(XCodeBuildHelper::CoverageHtmlConverter).to receive(:convert_file).and_return(converted_result)
+        expect(FileUtils).to receive(:mkdir_p).with('/build/reports')
+        allow(File).to receive(:write).with("/build/reports/FILE_A.html", "HTML STUFF")
 
         XCodeBuildHelper.generate_coverage(:default, :plan_a)
       end

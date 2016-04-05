@@ -1,6 +1,7 @@
 require 'xcode'
 require 'execute'
 require 'coverage_html_converter'
+require 'fileutils'
 
 module XCodeBuildHelper
   @registry = {}
@@ -86,6 +87,7 @@ module XCodeBuildHelper
       result.split("\n\n").each do |file|
         converted_result = XCodeBuildHelper::CoverageHtmlConverter.convert_file file
         if converted_result
+          FileUtils::mkdir_p coverage_plan.get_output
           basename = File.basename(converted_result[:title])
           File.write(File.join(coverage_plan.get_output, basename + '.html'), converted_result[:content].to_html)
         end
