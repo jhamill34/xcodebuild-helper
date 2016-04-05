@@ -4,11 +4,11 @@ require 'nokogiri'
 RSpec.describe XCodeBuildHelper::CoverageHtmlConverter do
   context "#convert_file" do
     it "should return a table element" do
-      converter = XCodeBuildHelper::CoverageHtmlConverter.new
       input = "TITLE\n0 | 12|# some random code\n1 | 13|# other random code"
-      output = converter.convert_file input
-      document = Nokogiri::HTML(output.to_html)
+      output = XCodeBuildHelper::CoverageHtmlConverter.convert_file input
+      document = Nokogiri::HTML(output[:content].to_html)
 
+      expect(output[:title]).to eq "TITLE"
       # assert the look of the document
       expect(document.css('body h1').first.to_html).to eq "<h1>TITLE</h1>"
       expect(document.css('body table tr').length).to eq 2

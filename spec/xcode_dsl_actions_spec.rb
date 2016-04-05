@@ -1,4 +1,5 @@
 require 'xcodebuild-helper'
+require 'nokogiri'
 
 RSpec.describe "DSL actions" do
   context "build" do
@@ -99,8 +100,28 @@ RSpec.describe "DSL actions" do
     it "will return the CLI for finding code coverage" do
       allow(XCodeBuildHelper).to receive(:app_binary_location).and_return("/path/to/app/bin")
       allow(XCodeBuildHelper).to receive(:profdata_location).and_return("/path/to/app/prof")
-      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcrun llvm-cov show -instr-profile \"/path/to/app/prof\" \"/path/to/app/bin\" path/to/files/*")
+      expect(XCodeBuildHelper::Execute).to receive(:call).with("xcrun llvm-cov show -instr-profile \"/path/to/app/prof\" \"/path/to/app/bin\" path/to/files/*").and_return("")
       XCodeBuildHelper.generate_coverage(:default, :plan_a)
+    end
+
+    context "converting results to html" do
+      it "will parse the results and call convert to html" do
+        allow(XCodeBuildHelper::Execute).to receive(:call).and_return("/path/to/file/FILE_A\n0 | 1|# some random code\n\n/path/to/file/FILE_B\n0| 2|#other random code")
+        expect(XCodeBuildHelper::CoverageHtmlConverter).to receive(:convert_file).twice
+        XCodeBuildHelper.generate_coverage(:default, :plan_a)
+      end
+
+      it "will save the results to a the file name header" do
+        mockHtml = double(Nokogiri::HTML::Builder)
+        allow(mockHtml).to receive(:to_html).and_return("HTML STUFF")
+        converted_result = { :content => mockHtml, :title => "/path/to/file/FILE_A"}
+
+        allow(XCodeBuildHelper::Execute).to receive(:call).and_return("FILE_A\nHTML STUFF")
+        allow(XCodeBuildHelper::CoverageHtmlConverter).to receive(:convert_file).and_return(converted_result)
+        expect(File).to receive(:write).with("FILE_A.html", "HTML STUFF")
+
+        XCodeBuildHelper.generate_coverage(:default, :plan_a)
+      end
     end
   end
 

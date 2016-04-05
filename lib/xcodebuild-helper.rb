@@ -1,5 +1,6 @@
 require 'xcode'
 require 'execute'
+require 'coverage_html_converter'
 
 module XCodeBuildHelper
   @registry = {}
@@ -82,6 +83,13 @@ module XCodeBuildHelper
     unless xcode == nil
       coverage_plan = xcode.get_coverage_plan(plan)
       result = XCodeBuildHelper::Execute.call("xcrun llvm-cov show -instr-profile \"#{profdata_location(xcode)}\" \"#{app_binary_location(xcode)}\" #{coverage_plan.get_source_files.first}")
+      result.split("\n\n").each do |file|
+        converted_result = XCodeBuildHelper::CoverageHtmlConverter.convert_file file
+        if converted_result
+          basename = File.basename(converted_result[:title])
+          File.write(basename + '.html', converted_result[:content].to_html)
+        end
+      end
     end
   end
 

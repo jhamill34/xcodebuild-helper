@@ -8,11 +8,11 @@ module XCodeBuildHelper
   LINE_INFO_DELIMITER = "|"
 
   class CoverageHtmlConverter
-    def convert_file(input)
+    def self.convert_file(input)
       lines = input.split(LINE_BREAK_DELIMITER)
       title = lines.first
       lines = lines[1..-1]
-      return Nokogiri::HTML::Builder.new do |doc|
+      builder = Nokogiri::HTML::Builder.new do |doc|
         doc.html {
           doc.head {
 
@@ -41,6 +41,8 @@ module XCodeBuildHelper
           }
         }
       end
+
+      {:content => builder, :title => title}
     end
   end
 end
