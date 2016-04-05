@@ -14,5 +14,10 @@ RSpec.describe XCodeBuildHelper::CoveragePlan do
       @coverage_plan.source_files ["path/tofiles/*.m"]
       expect(@coverage_plan.get_source_files).to eq ["path/tofiles/*.m"]
     end
+
+    it "should set the output location" do
+      @coverage_plan.output "/path/to/output"
+      expect(@coverage_plan.get_output).to eq "/path/to/output"
+    end
   end
 end

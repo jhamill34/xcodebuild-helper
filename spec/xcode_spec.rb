@@ -56,11 +56,17 @@ RSpec.describe XCodeBuildHelper::XCode do
     before(:each) do
       @coverage_plan = XCodeBuildHelper::CoveragePlan.new
       @coverage_plan.source_files ["path/to/files/*.m"]
+      @coverage_plan.output "/path/to/output"
     end
 
     it "should set the source files" do
       @xcode.coverage_plan(:plan_a, @coverage_plan)
       expect(@xcode.get_coverage_plan(:plan_a).get_source_files).to eq ["path/to/files/*.m"]
+    end
+
+    it "should get the output directory" do
+      @xcode.coverage_plan(:plan_a, @coverage_plan)
+      expect(@xcode.get_coverage_plan(:plan_a).get_output).to eq "/path/to/output"
     end
   end
 
