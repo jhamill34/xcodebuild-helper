@@ -9,6 +9,10 @@ module XCodeBuildHelper
     @registry[name]
   end
 
+  def self.gem_location
+    File.expand_path(File.dirname(__dir__))
+  end
+
   def self.define(name, &block)
     xcode = @registry[name]
     if xcode == nil
@@ -83,15 +87,26 @@ module XCodeBuildHelper
     xcode = @registry[name]
     unless xcode == nil
       coverage_plan = xcode.get_coverage_plan(plan)
-      result = XCodeBuildHelper::Execute.call("xcrun llvm-cov show -instr-profile \"#{profdata_location(xcode)}\" \"#{app_binary_location(xcode)}\" #{coverage_plan.get_source_files.first}")
+      src_files = Dir.glob(coverage_plan.get_source_files.first).map{|file| file.gsub(/ /, "\\ ") }.join(' ')
+      result = XCodeBuildHelper::Execute.call("xcrun llvm-cov show -instr-profile \"#{profdata_location(xcode)}\" \"#{app_binary_location(xcode)}\" #{src_files}")
+      result = result.gsub(/^warning:.*\n/, '')
+      all_results = []
       result.split("\n\n").each do |file|
         converted_result = XCodeBuildHelper::CoverageHtmlConverter.convert_file file
+        all_results << converted_result
         if converted_result
           FileUtils::mkdir_p coverage_plan.get_output
           basename = File.basename(converted_result[:title])
           File.write(File.join(coverage_plan.get_output, basename + '.html'), converted_result[:content].to_html)
         end
       end
+
+      unless all_results.empty?
+        index_file = XCodeBuildHelper::CoverageHtmlConverter.create_index all_results
+        File.write(File.join(coverage_plan.get_output, 'index.html'), index_file.to_html)
+      end
+
+      FileUtils::cp(File.join(gem_location, 'assets/style.css'), coverage_plan.get_output)
     end
   end
 

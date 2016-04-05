@@ -1,0 +1,102 @@
+body{
+  width: 100%;
+  font-weight: 16px;
+  font-family: 'Helvetica', sans-serif;
+  color: rgb(68, 68, 68);
+  padding: 0;
+  margin: 0;
+}
+
+h1{
+  margin: 0.5em 1em;
+}
+
+.low{
+  color: rgb(189, 78, 62);
+}
+
+.mid{
+  color: rgb(212, 168, 103);
+}
+
+.high{
+  color: rgb(105, 173, 81);
+}
+
+a{
+  text-decoration: none;
+  color: rgb(56, 56, 56);
+}
+
+table{
+  border-collapse: collapse;
+  background-color: rgb(228, 240, 242);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+table.main{
+  width: 100%;
+}
+
+.total_coverage{
+  font-weight: bold;
+  font-size: 2em;
+  margin: 0.5em 1em;
+}
+
+table.main tr{
+  float: left;
+  width: 50%;
+}
+
+tr:hover{
+  background-color: rgba(164, 164, 164, 0.32);
+}
+
+td{
+  padding: 5px;
+}
+
+tr.irrelevant{
+  background-color: transparent;
+}
+
+tr.covered{
+  background-color: rgb(153, 213, 174);
+}
+
+tr.covered:hover{
+  background-color: rgb(59, 196, 106);
+  cursor: pointer;
+}
+
+tr.uncovered{
+  background-color: rgb(205, 133, 123);
+}
+
+tr.uncovered:hover{
+  background-color: rgb(199, 76, 59);
+  cursor: pointer;
+}
+
+td.name, td.coverage, td.num{
+  font-weight: bold;
+}
+
+td.name{
+  width: 100%;
+}
+
+table.main td.coverage{
+  width: 100%;
+}
+
+td.coverage{
+  text-align: right;
+}
+
+td.num{
+  background-color: rgba(136, 136, 136, 0.52);
+  width: 3em;
+}
