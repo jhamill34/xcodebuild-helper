@@ -15,5 +15,13 @@ module XCodeBuildHelper
     def get_source_files
       @source_files
     end
+
+    def output(name)
+      @output = name
+    end
+
+    def get_output
+      @output
+    end
   end
 end

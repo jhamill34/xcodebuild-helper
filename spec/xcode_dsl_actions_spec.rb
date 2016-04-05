@@ -76,6 +76,7 @@ RSpec.describe "DSL actions" do
         coverage_plan :plan_a do
           report_type "xml"
           source_files ["path/to/files/*"]
+          output "/build/reports"
         end
       end
     end
@@ -118,7 +119,7 @@ RSpec.describe "DSL actions" do
 
         allow(XCodeBuildHelper::Execute).to receive(:call).and_return("FILE_A\nHTML STUFF")
         allow(XCodeBuildHelper::CoverageHtmlConverter).to receive(:convert_file).and_return(converted_result)
-        expect(File).to receive(:write).with("FILE_A.html", "HTML STUFF")
+        expect(File).to receive(:write).with("/build/reports/FILE_A.html", "HTML STUFF")
 
         XCodeBuildHelper.generate_coverage(:default, :plan_a)
       end

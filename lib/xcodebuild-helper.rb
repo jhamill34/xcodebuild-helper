@@ -87,7 +87,7 @@ module XCodeBuildHelper
         converted_result = XCodeBuildHelper::CoverageHtmlConverter.convert_file file
         if converted_result
           basename = File.basename(converted_result[:title])
-          File.write(basename + '.html', converted_result[:content].to_html)
+          File.write(File.join(coverage_plan.get_output, basename + '.html'), converted_result[:content].to_html)
         end
       end
     end
