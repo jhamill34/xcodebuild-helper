@@ -79,6 +79,19 @@ module XCodeBuildHelper
     Dir.glob(base_app_location(project) + "/CodeCoverage/#{project.get_scheme}/Products/#{project.get_config}-#{project.get_sdk}/#{project.get_workspace.gsub(/\s+/, '\\ ')}.app/#{project.get_workspace.gsub(/\s+/,"\\ ")}").first
   end
 
+  def self.get_binary(xcode)
+    unless xcode == nil
+        cmd = create_base_cmd(xcode)
+        settings = XCodeBuildHelper::Execute.call(cmd + "-showBuildSettings")
+        result = /TARGET_BUILD_DIR = ([a-zA-Z0-9\/ _\-]+)/.match(settings)
+        if(result != nil)
+          result[1] + "/#{xcode.get_workspace.gsub(/\s+/, '\\ ')}.app"
+        else
+          ""
+        end
+    end
+  end
+
   def self.profdata_location(project)
     Dir.glob(base_app_location(project) + "/CodeCoverage/#{project.get_scheme}/Coverage.profdata").first
   end
@@ -139,7 +152,7 @@ module XCodeBuildHelper
     unless xcode == nil
       device = xcode.get_device(device)
       log_location = "./simulator-debug.log"
-      XCodeBuildHelper::Execute.call("bundle exec ios-sim launch #{app_binary_location(xcode)} --devicetypeid \"#{device.get_name.gsub(/\s+/, '-')}, #{device.get_os}\" --log #{log_location}")
+      XCodeBuildHelper::Execute.call("bundle exec ios-sim launch \"#{get_binary(xcode)}\" --devicetypeid \"#{device.get_name.gsub(/\s+/, '-')}, #{device.get_os}\"")
     end
   end
 end
