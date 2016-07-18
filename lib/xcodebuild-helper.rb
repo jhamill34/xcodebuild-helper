@@ -152,7 +152,7 @@ module XCodeBuildHelper
     unless xcode == nil
       device = xcode.get_device(device)
       log_location = "./simulator-debug.log"
-      XCodeBuildHelper::Execute.call("bundle exec ios-sim launch \"#{get_binary(xcode)}\" --devicetypeid \"#{device.get_name.gsub(/\s+/, '-')}, #{device.get_os}\"")
+      XCodeBuildHelper::Execute.call("bundle exec ios-sim launch \"#{get_binary(xcode)}\" --devicetypeid \"#{device.get_name.gsub(/\s+/, '-')}, #{device.get_os}\" --log #{log_location}")
     end
   end
 end
