@@ -1,8 +1,8 @@
 PATH
   remote: .
   specs:
-    xcodebuild-helper (1.2.0)
-      nokogiri (~> 1.6)
+    xcodebuild-helper (1.2.1)
+      nokogiri (~> 1.6.7)
       xcodeproj (~> 0.28)
       xcpretty (~> 0.2)
 
@@ -65,7 +65,7 @@ GEM
     rb-fsevent (0.9.7)
     rb-inotify (0.9.7)
       ffi (>= 0.5.0)
-    rouge (1.10.1)
+    rouge (1.11.1)
     rspec (3.4.0)
       rspec-core (~> 3.4.0)
       rspec-expectations (~> 3.4.0)
