@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    xcodebuild-helper (1.1.1)
+    xcodebuild-helper (1.2.0)
       nokogiri (~> 1.6)
       xcodeproj (~> 0.28)
       xcpretty (~> 0.2)
@@ -50,7 +50,7 @@ GEM
     lumberjack (1.0.10)
     method_source (0.8.2)
     mini_portile2 (2.0.0)
-    minitest (5.8.4)
+    minitest (5.9.0)
     nenv (0.3.0)
     nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
