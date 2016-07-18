@@ -224,4 +224,27 @@ RSpec.describe "DSL actions" do
       XCodeBuildHelper.lint(:default, :plan_a)
     end
   end
+
+  context "launch" do
+    before(:each) do
+      XCodeBuildHelper.define :default do
+        workspace "WORK SPACE"
+        scheme "SCHEME"
+        sdk "SDK"
+        config "CONFIG"
+
+        device :ipad do
+          platform "PLATFORM"
+          name "NAME TWO"
+          os "OS"
+        end
+      end
+    end
+
+    it "should call the correct cli to launch the device" do
+        allow(XCodeBuildHelper).to receive(:get_binary).and_return("/path/to/app/bin")
+        expect(XCodeBuildHelper::Execute).to receive(:call).with("bundle exec ios-sim launch \"/path/to/app/bin\" --devicetypeid \"NAME-TWO, OS\" --log ./simulator-debug.log")
+        XCodeBuildHelper.launch(:default, :ipad)
+    end
+  end
 end
