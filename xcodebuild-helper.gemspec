@@ -8,6 +8,7 @@ Gem::Specification.new do |s|
   s.date          = '2016-03-30'
   s.summary       = 'DSL to help call xcode CLI more easliy'
   s.description   = 'Very useful when writing scripts to automate xcode development or when creating ci scripts to automate deployment'
+  s.files         = `git ls-files`.split("\n")
   s.authors       = ['Joshua Rasmussen']
   s.email         = 'xlr8runner@gmail.com'
   s.require_paths = ['lib']
