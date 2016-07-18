@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    xcodebuild-helper (1.2.2)
+    xcodebuild-helper (1.2.3)
       nokogiri (= 1.6.7.2)
       xcodeproj (~> 0.28)
       xcpretty (~> 0.2)
