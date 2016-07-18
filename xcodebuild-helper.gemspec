@@ -10,7 +10,6 @@ Gem::Specification.new do |s|
   s.description   = 'Very useful when writing scripts to automate xcode development or when creating ci scripts to automate deployment'
   s.authors       = ['Joshua Rasmussen']
   s.email         = 'xlr8runner@gmail.com'
-  s.files         = `git ls-files`.split($\)
   s.require_paths = ['lib']
   s.executables   = s.files.grep(%r{^bin/}){ |f| File.basename(f) }
   s.test_files    = s.files.grep(%r{^(spec)})
