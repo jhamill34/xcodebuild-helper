@@ -22,6 +22,6 @@ Gem::Specification.new do |s|
 	s.add_development_dependency "rake", ["~> 11.1"]
 
   s.add_dependency "xcpretty", ["~> 0.2"]
-  s.add_dependency "xcodeproj", ["~> 0.28"]
+  s.add_dependency "xcodeproj",["~> 1.0"] 
   s.add_dependency "nokogiri", ["1.6.7.2"]
 end
